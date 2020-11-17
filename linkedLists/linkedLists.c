@@ -1,18 +1,24 @@
 #include "linkedLists.h"
 
+struct list newList(Tipo t) {
+	struct list result = {NULL, NULL, t, 0};
+	return result;
+}
 
 void deleteList(struct list* list) {
-	struct Node* temp = list->_head;
+	struct Node* temp = list->head;
+	del_g* deleteData = getDel(list->tipo);
 
 	while(temp) {
-		temp = list->_head->next;
-		free(list->_head);
-		list->_head = temp;
+		temp = list->head->next;
+		deleteData(list->head->data);
+		free(list->head);
+		list->head = temp;
 	}
 }
 
 struct list copyList(const struct list* toCopy) {
-	struct list result = NEW_LIST;
+	struct list result = newList(toCopy->tipo);
 
 	_PTRiterate(iter, toCopy)
 		append(&result, iter->data);
@@ -25,58 +31,60 @@ void createFromArray(struct list *list, const int* array, const int arrayLen) {
 		append(list, array[i]);
 }
 
-void append(struct list *list, const int value) {
+void append(struct list *list, void* value) {
+	cpy_g* copiarData = getCpy(list->tipo);
 
 	struct Node* newTail = (struct Node*) malloc(sizeof(struct Node));
-	newTail->data = value;	
+	newTail->data = copiarData(value);	
 	newTail->next = NULL;
 
-	if (list->_head && list->_tail) {
-		newTail->prev = list->_tail;
-		list->_tail->next = newTail;
+	if (list->head && list->tail) {
+		newTail->prev = list->tail;
+		list->tail->next = newTail;
 
 	} else {
 		newTail->prev = NULL;
-		list->_head = newTail;
+		list->head = newTail;
 	}
 	
-	list->_tail = newTail;
+	list->tail = newTail;
 	
-	list->_length++;
+	list->length++;
 }
 
-void prepend(struct list *list, const int value) {
+void prepend(struct list *list, void* value) {
+	cpy_g* copiarData = getCpy(list->tipo);
 
 	struct Node* newHead = (struct Node*)  malloc(sizeof(struct Node));
-	newHead->data = value;	
+	newHead->data = copiarData(value);	
 	newHead->prev = NULL;
 
-	if (list->_head && list->_tail) {
-		newHead->next = list->_head;
-		list->_head->prev = newHead;
+	if (list->head && list->tail) {
+		newHead->next = list->head;
+		list->head->prev = newHead;
 
 	} else {
 		newHead->next = NULL;
-		list->_tail = newHead;
+		list->tail = newHead;
 	}
 	
-	list->_head = newHead;
+	list->head = newHead;
 	
-	list->_length++;
+	list->length++;
 }
 
 int nthValue(const struct list* list, const int n) {
 
-	if (n >= 0 && n < list->_length) {
-		struct Node* iter = (n < list->_length / 2) 
-		? list->_head : list->_tail;
+	if (n >= 0 && n < list->length) {
+		struct Node* iter = (n < list->length / 2) 
+		? list->head : list->tail;
 
-		if (n < (list->_length / 2)) {
+		if (n < (list->length / 2)) {
 			for(int i = 0; i < n ; i++)
 					   iter = iter->next;
 
 		} else {
-			for(int i = list->_length - 1; i > n ; i--)
+			for(int i = list->length - 1; i > n ; i--)
 					   iter = iter->prev;
 		}
 		return iter->data;
