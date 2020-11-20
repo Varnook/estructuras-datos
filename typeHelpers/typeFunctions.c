@@ -1,6 +1,6 @@
 #include "typeFunctions.h"
 
-cmp_g* getCmp(tipo t) {
+cmp_g* getCmp(Tipo t) {
 	switch (t) {
 		case TipoInt:
 			return (cmp_g*)&cmp_int;
@@ -20,7 +20,7 @@ cmp_g* getCmp(tipo t) {
 	return 0;
 }
 
-cpy_g* getCpy(tipo t) {
+cpy_g* getCpy(Tipo t) {
 	switch (t) {
 		case TipoInt:
 			return (cpy_g*)&cpy_int;
@@ -40,7 +40,7 @@ cpy_g* getCpy(tipo t) {
 	return 0;
 }
 
-del_g* getDel(tipo t) {
+del_g* getDel(Tipo t) {
 	switch (t) {
 		case TipoInt:
 			return (del_g*)&del_int;
@@ -158,4 +158,203 @@ char* cpy_str(char* a) {
 
 void del_str(char* a) {
 	free(a);
+}
+
+// TODO Evitar llamar a malloc y trabajar directo en la lista.
+void _mergeSortInt(int* array, int arrLen) {
+	
+	if (arrLen == 1)
+		return;
+
+	if (arrLen == 2) {
+		if (array[1] < array[0]) {
+			int temp = array[0];
+			array[0] = array[1];
+			array[1] = temp;
+		}
+		return;
+	}
+
+	int fst_mid = arrLen / 2, snd_mid = arrLen - fst_mid;
+
+	int *fstArr = malloc(sizeof(int) * fst_mid);
+	int *sndArr = malloc(sizeof(int) * snd_mid);
+
+	for (int i = 0; i < fst_mid; i++)
+		fstArr[i] = array[i];
+
+	for (int i = 0; i < snd_mid; i++)
+		sndArr[i] = array[i + fst_mid];
+
+	_mergeSortInt(fstArr, fst_mid);
+	_mergeSortInt(sndArr, snd_mid);
+	
+	// Merge part
+	int	fstIt = 0, sndIt = 0;
+
+	while (fstIt < fst_mid && sndIt < snd_mid) {
+
+		if (sndArr[sndIt] < fstArr[fstIt]) {
+			array[fstIt + sndIt] = sndArr[sndIt];
+			sndIt++;
+
+		} else {
+			array[fstIt + sndIt] = fstArr[fstIt];
+			fstIt++;
+		}
+	}
+
+	if (fstIt == fst_mid) {
+
+		while(sndIt < snd_mid) {
+			array[fstIt + sndIt] = sndArr[sndIt];
+			sndIt++;
+		}
+
+	} else {
+		while(fstIt < fst_mid) {
+			array[fstIt + sndIt] = fstArr[fstIt];
+			fstIt++;
+		}
+	}
+	free(fstArr);
+	free(sndArr);
+}
+
+// TODO Evitar llamar a malloc y trabajar directo en la lista.
+void _mergeSortFloat(float* array, int arrLen) {
+
+	if (arrLen == 1)
+		return;
+
+	if (arrLen == 2) {
+		if (array[1] < array[0]) {
+			float temp = array[0];
+			array[0] = array[1];
+			array[1] = temp;
+		}
+		return;
+	}
+
+	int fst_mid = arrLen / 2, snd_mid = arrLen - fst_mid;
+
+	float *fstArr = malloc(sizeof(float) * fst_mid);
+	float *sndArr = malloc(sizeof(float) * snd_mid);
+
+	for (int i = 0; i < fst_mid; i++)
+		fstArr[i] = array[i];
+
+	for (int i = 0; i < snd_mid; i++)
+		sndArr[i] = array[i + fst_mid];
+
+	_mergeSortFloat(fstArr, fst_mid);
+	_mergeSortFloat(sndArr, snd_mid);
+	
+	// Merge part
+	int	fstIt = 0, sndIt = 0;
+
+	while (fstIt < fst_mid && sndIt < snd_mid) {
+
+		if (sndArr[sndIt] < fstArr[fstIt]) {
+			array[fstIt + sndIt] = sndArr[sndIt];
+			sndIt++;
+
+		} else {
+			array[fstIt + sndIt] = fstArr[fstIt];
+			fstIt++;
+		}
+	}
+
+	if (fstIt == fst_mid) {
+
+		while(sndIt < snd_mid) {
+			array[fstIt + sndIt] = sndArr[sndIt];
+			sndIt++;
+		}
+
+	} else {
+		while(fstIt < fst_mid) {
+			array[fstIt + sndIt] = fstArr[fstIt];
+			fstIt++;
+		}
+	}
+	free(fstArr);
+	free(sndArr);
+}
+// TODO Evitar llamar a malloc y trabajar directo en la lista.
+void _mergeSortChar(char* array, int arrLen) {
+	
+	if (arrLen == 1)
+		return;
+
+	if (arrLen == 2) {
+		if (array[1] < array[0]) {
+			char temp = array[0];
+			array[0] = array[1];
+			array[1] = temp;
+		}
+		return;
+	}
+
+	int fst_mid = arrLen / 2, snd_mid = arrLen - fst_mid;
+
+	char *fstArr = malloc(sizeof(char) * fst_mid);
+	char *sndArr = malloc(sizeof(char) * snd_mid);
+
+	for (int i = 0; i < fst_mid; i++)
+		fstArr[i] = array[i];
+
+	for (int i = 0; i < snd_mid; i++)
+		sndArr[i] = array[i + fst_mid];
+
+	_mergeSortChar(fstArr, fst_mid);
+	_mergeSortChar(sndArr, snd_mid);
+	
+	// Merge part
+	int	fstIt = 0, sndIt = 0;
+
+	while (fstIt < fst_mid && sndIt < snd_mid) {
+
+		if (sndArr[sndIt] < fstArr[fstIt]) {
+			array[fstIt + sndIt] = sndArr[sndIt];
+			sndIt++;
+
+		} else {
+			array[fstIt + sndIt] = fstArr[fstIt];
+			fstIt++;
+		}
+	}
+
+	if (fstIt == fst_mid) {
+
+		while(sndIt < snd_mid) {
+			array[fstIt + sndIt] = sndArr[sndIt];
+			sndIt++;
+		}
+
+	} else {
+		while(fstIt < fst_mid) {
+			array[fstIt + sndIt] = fstArr[fstIt];
+			fstIt++;
+		}
+	}
+	free(fstArr);
+	free(sndArr);
+}
+
+// TODO ver que hacer con Str
+void mergeSort(void* array, int arrLen, Tipo t) {
+	switch (t) {
+		case TipoInt:
+			_mergeSortInt((int*) array, arrLen);
+			break;
+		case TipoFloat:
+			_mergeSortFloat((float*) array, arrLen);
+			break;
+		case TipoChar:
+			_mergeSortChar((char*) array, arrLen);
+			break;
+		case TipoStr:
+			break;
+	}
 }

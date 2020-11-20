@@ -14,33 +14,29 @@ struct Node {
 	struct Node* next;
 };
 
-struct list{
+typedef struct list{
 	struct Node* head;
 	struct Node* tail;
 	Tipo tipo;
 	int length;
-};
+} List;
 
-struct list newList(Tipo t);
+List newList(Tipo t);
 
-void deleteList(struct list* list);
+void deleteList(List* list);
 
-struct list copyList(const struct list* toCopy);
+List copyList(const List* toCopy);
 
-void createFromArray(struct list* list, void* array, const int arrayLen);
+List createFromArray(Tipo t, void* array, const int arrayLen);
 
-void append(struct list* list, void* value);
+void append(List* list, void* value);
 
-void prepend(struct list* list, void* value);
+void prepend(List* list, void* value);
 
-int nthValue(const struct list* list, const int n);
+void* nthValue(const List* list, const int n);
 
-int findValue(const struct list* list, void* value);
+int findValue(const List* list, void* value);
 
-void joinLists(struct list* firstL, struct list* seconL);
+void joinLists(List* firstL, List* seconL);
 
-struct list mergeLists(const struct list* firstL, const struct list* seconL);
-
-void mergeSort(struct list* list);
-
-void _mergeSortArr(int* array, int arrLen);
+void mergeLists(List* firstL, List* seconL);

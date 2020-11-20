@@ -1,11 +1,11 @@
 #include "linkedLists.h"
 
-struct list newList(Tipo t) {
-	struct list result = {NULL, NULL, t, 0};
+List newList(Tipo t) {
+	List result = {NULL, NULL, t, 0};
 	return result;
 }
 
-void deleteList(struct list* list) {
+void deleteList(List* list) {
 	struct Node* temp = list->head;
 	del_g* deleteData = getDel(list->tipo);
 
@@ -17,8 +17,8 @@ void deleteList(struct list* list) {
 	}
 }
 
-struct list copyList(const struct list* toCopy) {
-	struct list result = newList(toCopy->tipo);
+List copyList(const List* toCopy) {
+	List result = newList(toCopy->tipo);
 
 	_PTRiterate(iter, toCopy)
 		append(&result, iter->data);
@@ -26,12 +26,14 @@ struct list copyList(const struct list* toCopy) {
 	return result;
 }
 
-void createFromArray(struct list *list, const int* array, const int arrayLen) {
+List createFromArray(Tipo t, void* array, const int arrayLen) {
+	List list = newList(t);
 	for (int i = 0; i < arrayLen; i++)
-		append(list, array[i]);
+		append(&list, array + i);
+	return list;
 }
 
-void append(struct list *list, void* value) {
+void append(List *list, void* value) {
 	cpy_g* copiarData = getCpy(list->tipo);
 
 	struct Node* newTail = (struct Node*) malloc(sizeof(struct Node));
@@ -52,7 +54,7 @@ void append(struct list *list, void* value) {
 	list->length++;
 }
 
-void prepend(struct list *list, void* value) {
+void prepend(List *list, void* value) {
 	cpy_g* copiarData = getCpy(list->tipo);
 
 	struct Node* newHead = (struct Node*)  malloc(sizeof(struct Node));
@@ -73,11 +75,12 @@ void prepend(struct list *list, void* value) {
 	list->length++;
 }
 
-int nthValue(const struct list* list, const int n) {
+void* nthValue(const List* list, const int n) {
 
 	if (n >= 0 && n < list->length) {
-		struct Node* iter = (n < list->length / 2) 
-		? list->head : list->tail;
+		struct Node* iter = 
+			(n < list->length / 2) ? 
+			list->head : list->tail;
 
 		if (n < (list->length / 2)) {
 			for(int i = 0; i < n ; i++)
@@ -87,146 +90,76 @@ int nthValue(const struct list* list, const int n) {
 			for(int i = list->length - 1; i > n ; i--)
 					   iter = iter->prev;
 		}
-		return iter->data;
+		cpy_g* copiarData = getCpy(list->tipo);
+		return copiarData(iter->data);
 
 	} else {
-		printf("return Nth value: index not in range of list, returning -1");
-		return -1;
+		printf("return Nth value: index not in range of list");
+		return NULL;
 	}
 }
 
-int findValue(const struct list* list, const int value) {
+int findValue(const List* list, void* value) {
 	int position = 0;
-	struct Node* iter = list->_head;
+	struct Node* iter = list->head;
 
-	while(iter && iter->data != value) {
+	cmp_g* compData = getCmp(list->tipo);
+
+	while(iter && compData(iter->data, value)) {
 		position++;
 		iter = iter->next;
 	}
-
 	return position;
 }
 
-void joinLists(struct list* firstL, struct list* seconL) {
+void joinLists(List* firstL, List* seconL) {
 
-	firstL->_tail->next = seconL->_head;
-	seconL->_head->prev = firstL->_tail;
+	firstL->tail->next = seconL->head;
+	seconL->head->prev = firstL->tail;
 
-	firstL->_tail = seconL->_tail;
-	firstL->_length += seconL->_length;
+	firstL->tail = seconL->tail;
+	firstL->length += seconL->length;
 }
 
-struct list mergeLists(const struct list* firstL, const struct list* seconL) {
-
-	struct list result = NEW_LIST;
-	
+void mergeLists(List* firstL, List* seconL) {
 	struct Node
-		*fstIter = firstL->_head,
-		*sndIter = seconL->_head;
+		*fstIter = firstL->head,
+		*sndIter = seconL->head,
+		*iter;
+
+	cmp_g* compData = getCmp(firstL->tipo);
 	
+	firstL->length += seconL->length;
+
+	if(compData(fstIter->data, sndIter->data) == 1) {
+		firstL->head = sndIter;
+		iter = sndIter;
+	} else {
+		iter = fstIter;
+	}
+
 	while(fstIter && sndIter) {
 		
-		if(fstIter->data <= sndIter->data) {
-			append(&result, fstIter->data);
+		if(compData(fstIter->data, sndIter->data) < 1) {
+			iter->next = fstIter;
+			fstIter->prev = iter;
+
+			iter = fstIter;
 			fstIter = fstIter->next;
 
 		} else {
-			append(&result, sndIter->data);
+			iter->next = sndIter;
+			sndIter->prev = iter;
+
+			iter = sndIter;
 			sndIter = sndIter->next;
 		}
 	}
 
-	if (fstIter) {
-		for( ; fstIter; fstIter = fstIter->next)
-			append(&result, fstIter->data);
-
-	} else {
-		for( ; sndIter; sndIter = sndIter->next)
-			append(&result, sndIter->data);
+	if (sndIter) {
+		sndIter->prev = iter;
+		iter->next = sndIter;
+		for( ; sndIter->next; sndIter = sndIter->next);
+		firstL->head = sndIter;
 	}
-
-	return result;
-}
-
-void mergeSort(struct list* list) {
-	
-	int arrLen = list->_length;
-
-	int* arrAux = malloc(sizeof(int) * arrLen);
-	int arrIter = 0;
-
-	_PTRiterate(lstIter, list) {
-		arrAux[arrIter] = lstIter->data;
-		arrIter++;
-	}
-
-	_mergeSortArr(arrAux, arrLen);
-
-	arrIter = 0;
-
-	_PTRiterate(lstIter, list) {
-		lstIter->data = arrAux[arrIter];
-		arrIter++;
-	}
-	free(arrAux);
-}
-
-void _mergeSortArr(int* array, int arrLen) {
-	
-	if (arrLen == 1)
-		return;
-
-	if (arrLen == 2) {
-		if (array[1] < array[0]) {
-			int temp = array[0];
-			array[0] = array[1];
-			array[1] = temp;
-		}
-		return;
-	}
-
-	int fst_mid = arrLen / 2, snd_mid = arrLen - fst_mid;
-
-	int *fstArr = malloc(sizeof(int) * fst_mid);
-	int *sndArr = malloc(sizeof(int) * snd_mid);
-
-	for (int i = 0; i < fst_mid; i++)
-		fstArr[i] = array[i];
-
-	for (int i = 0; i < snd_mid; i++)
-		sndArr[i] = array[i + fst_mid];
-
-	_mergeSortArr(fstArr, fst_mid);
-	_mergeSortArr(sndArr, snd_mid);
-	
-	// Merge part
-	int	fstIt = 0, sndIt = 0;
-
-	while (fstIt < fst_mid && sndIt < snd_mid) {
-
-		if (sndArr[sndIt] < fstArr[fstIt]) {
-			array[fstIt + sndIt] = sndArr[sndIt];
-			sndIt++;
-
-		} else {
-			array[fstIt + sndIt] = fstArr[fstIt];
-			fstIt++;
-		}
-	}
-
-	if (fstIt == fst_mid) {
-
-		while(sndIt < snd_mid) {
-			array[fstIt + sndIt] = sndArr[sndIt];
-			sndIt++;
-		}
-
-	} else {
-		while(fstIt < fst_mid) {
-			array[fstIt + sndIt] = fstArr[fstIt];
-			fstIt++;
-		}
-	}
-	free(fstArr);
-	free(sndArr);
 }
