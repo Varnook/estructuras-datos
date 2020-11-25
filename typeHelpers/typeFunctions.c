@@ -11,9 +11,6 @@ cmp_g* getCmp(Tipo t) {
 		case TipoChar:
 			return (cmp_g*)&cmp_char;
 			break;
-		case TipoStr:
-			return (cmp_g*)&cmp_str;
-			break;
 		default:
 			break;
 	}
@@ -31,9 +28,6 @@ cpy_g* getCpy(Tipo t) {
 		case TipoChar:
 			return (cpy_g*)&cpy_char;
 			break;
-		case TipoStr:
-			return (cpy_g*)&cpy_str;
-			break;
 		default:
 			break;
 	}
@@ -50,9 +44,6 @@ del_g* getDel(Tipo t) {
 			break;
 		case TipoChar:
 			return (del_g*)&del_char;
-			break;
-		case TipoStr:
-			return (del_g*)&del_str;
 			break;
 		default:
 			break;
@@ -112,51 +103,6 @@ char* cpy_char(char* a) {
 }
 
 void del_char(char* a) {
-	free(a);
-}
-
-//-- String --\\
-
-// devuelve la longitud del string sin el caracter nulo
-int stringLen(char* a) {
-	int res = 0;
-	char it = a[res];
-
-	while (it != '\0') {
-		res++;
-		it = a[res];
-	}
-
-	return res;
-}
-
-int cmp_str(char* a, char* b) {
-	int aLen = stringLen(a);
-	int bLen = stringLen(b);
-
-	int menorLen = aLen < bLen ? aLen : bLen;
-
-	for (int i = 0; i < menorLen; i++) {
-		if (a[i] < b[i]) return -1;
-		if (a[i] > b[i]) return  1;
-	}
-
-	if (aLen < bLen) return -1;
-	if (aLen > bLen) return  1;
-	return 0;
-}
-
-char* cpy_str(char* a) {
-	int   len = stringLen(a);
-	char* res = malloc(sizeof(char) * ++len);
-
-	for (int i = 0; i < len; i++)
-		res[i] = a[i];
-
-	return res;
-}
-
-void del_str(char* a) {
 	free(a);
 }
 
@@ -354,7 +300,7 @@ void mergeSort(void* array, int arrLen, Tipo t) {
 		case TipoChar:
 			_mergeSortChar((char*) array, arrLen);
 			break;
-		case TipoStr:
+		default:
 			break;
 	}
 }

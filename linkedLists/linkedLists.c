@@ -1,4 +1,5 @@
 #include "linkedLists.h"
+#include <features.h>
 
 List newList(Tipo t) {
 	List result = {NULL, NULL, t, 0};
@@ -28,8 +29,23 @@ List copyList(const List* toCopy) {
 
 List createFromArray(Tipo t, void* array, const int arrayLen) {
 	List list = newList(t);
-	for (int i = 0; i < arrayLen; i++)
-		append(&list, array + i);
+	switch (t) {
+		case TipoInt:
+			for (int i = 0; i < arrayLen; i++)
+				append(&list, array + i * sizeof(int));
+			break;
+		case TipoFloat:
+			for (int i = 0; i < arrayLen; i++)
+				append(&list, array + i * sizeof(float));
+			break;
+		case TipoChar:
+			for (int i = 0; i < arrayLen; i++)
+				append(&list, array + i * sizeof(char));
+			break;
+		default:
+			break;
+	}
+
 	return list;
 }
 
@@ -134,8 +150,10 @@ void mergeLists(List* firstL, List* seconL) {
 	if(compData(fstIter->data, sndIter->data) == 1) {
 		firstL->head = sndIter;
 		iter = sndIter;
+		sndIter = sndIter->next;
 	} else {
 		iter = fstIter;
+		fstIter = fstIter->next;
 	}
 
 	while(fstIter && sndIter) {
@@ -160,6 +178,6 @@ void mergeLists(List* firstL, List* seconL) {
 		sndIter->prev = iter;
 		iter->next = sndIter;
 		for( ; sndIter->next; sndIter = sndIter->next);
-		firstL->head = sndIter;
+		firstL->tail= sndIter;
 	}
 }
